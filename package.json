@@ -6,11 +6,11 @@
   "author": "sp00m <christophe.maillard@rocketmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sp00m/ron.git"
+    "url": "git+https://github.com/sp00m/ron.js.git"
   },
-  "homepage": "https://github.com/sp00m/ron#readme",
+  "homepage": "https://github.com/sp00m/ron.js#readme",
   "bugs": {
-    "url": "https://github.com/sp00m/ron/issues"
+    "url": "https://github.com/sp00m/ron.js/issues"
   },
   "dependencies": {
     "co": "^4.6.0",
