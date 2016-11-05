@@ -1,0 +1,20 @@
+{
+  "name": "ron.js",
+  "version": "1.0.0",
+  "description": "REST over Node.js",
+  "main": "index.js",
+  "author": "sp00m <christophe.maillard@rocketmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sp00m/ron.git"
+  },
+  "homepage": "https://github.com/sp00m/ron#readme",
+  "bugs": {
+    "url": "https://github.com/sp00m/ron/issues"
+  },
+  "dependencies": {
+    "co": "^4.6.0",
+    "extend": "^3.0.0",
+    "mongodb": "^2.2.11"
+  }
+}
