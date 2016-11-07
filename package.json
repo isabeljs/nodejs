@@ -13,8 +13,12 @@
     "url": "https://github.com/sp00m/ron.js/issues"
   },
   "dependencies": {
+    "accepts": "^1.3.3",
     "co": "^4.6.0",
+    "debug": "^2.2.0",
     "extend": "^3.0.0",
+    "koa": "^1.2.4",
+    "koa-router": "^5.4.0",
     "mongodb": "^2.2.11"
   }
 }
