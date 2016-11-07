@@ -4,7 +4,7 @@ let database = undefined
 
 module.exports = {
 
-  connect: function*(url) {
+  connect: function *(url) {
     database = yield MongoClient.connect(url)
   },
 
