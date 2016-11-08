@@ -8,6 +8,8 @@ module.exports = {
     database = yield MongoClient.connect(url)
   },
 
+  get: () => database,
+
   collection: name => database.collection(name)
 
 }
