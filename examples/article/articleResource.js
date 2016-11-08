@@ -1,6 +1,7 @@
-const path = require("../../").resource.path
+const path = require("../../").api.path
 
 module.exports = {
+
   fromMongo: mongoObject => {
     return {
       id: mongoObject._id,
@@ -8,5 +9,9 @@ module.exports = {
       content: mongoObject.content
     }
   },
-  article: path("/articles/:id")
+
+  paths: {
+    article: path("/articles/:id")
+  }
+
 }
