@@ -2,7 +2,7 @@ const api = require("../../").api
 const articleResource = require("./articleResource")
 const articleService = require("./articleService")
 
-module.exports = function articleApi(router) {
+module.exports = router => {
 
   api(router)
 

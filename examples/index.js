@@ -13,7 +13,7 @@ co(function *() {
   mediaTypes(mediaTypes.HAL)
 
   // register APIs
-  require("./article/")(router)
+  require("./article/articleApi")(router)
 
   // bootstrap
   app.use(router.routes()).use(router.allowedMethods()).listen(3000)
