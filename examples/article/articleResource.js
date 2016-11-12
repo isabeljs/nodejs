@@ -11,7 +11,8 @@ module.exports = {
   },
 
   paths: {
-    article: path("/articles/:id")
+    article: path("/articles/:id"),
+    articles: path("/articles")
   }
 
 }

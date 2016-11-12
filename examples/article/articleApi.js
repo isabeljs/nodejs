@@ -16,4 +16,11 @@ module.exports = router => {
       }
     })
 
+    .get(articleResource.paths.articles, function *getArticles() {
+      const articles = yield articleService.list()
+      return api.ok(articles.map(article => articleResource.fromMongo(article)))
+        .forEach((resource, article) => resource.link("self", articleResource.paths.article(article.id)))
+        .link("self", articleResource.paths.articles())
+    })
+
 }
