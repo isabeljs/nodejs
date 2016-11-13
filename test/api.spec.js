@@ -1,6 +1,6 @@
 require("co-mocha")
+require("should")
 
-const expect = require("chai").expect
 const request = require('supertest')
 
 const app = require("koa")()
@@ -9,7 +9,7 @@ const bodyParser = require("koa-bodyparser")
 const mediaTypes = require("../").api.mediaTypes
 const database = require("../examples/database")
 
-describe("HAL", () => {
+describe("API", () => {
 
   const _createArticle = function *() {
     const article = {
@@ -27,7 +27,7 @@ describe("HAL", () => {
     app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
   })
 
-  it("should get single document", function *() {
+  it("should get a resource", function *() {
     const article = yield _createArticle()
     yield request("http://localhost:3000")
       .get(`/articles/${article._id}`)
@@ -43,7 +43,7 @@ describe("HAL", () => {
       })
   })
 
-  it("should get multiple documents", function *() {
+  it("should list resources", function *() {
     const article1 = yield _createArticle()
     const article2 = yield _createArticle()
     yield request("http://localhost:3000")
@@ -54,37 +54,47 @@ describe("HAL", () => {
           self: "http://localhost:3000/articles"
         },
         _embedded: [{
-          id: article1._id.toString(),
-          title: article1.title,
-          content: article1.content,
           _links: {
             self: `http://localhost:3000/articles/${article1._id}`
-          }
+          },
+          id: article1._id.toString(),
+          title: article1.title,
+          content: article1.content
         }, {
-          id: article2._id.toString(),
-          title: article2.title,
-          content: article2.content,
           _links: {
             self: `http://localhost:3000/articles/${article2._id}`
-          }
+          },
+          id: article2._id.toString(),
+          title: article2.title,
+          content: article2.content
         }]
       })
   })
 
-  it("should create single document", function *() {
-    yield request("http://localhost:3000")
+  it("should create a resource", function *() {
+    const newArticle = {
+      title: "New article title",
+      content: "New article content"
+    }
+    const response = yield request("http://localhost:3000")
       .post("/articles")
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
-      .send({
-        title: "New article title",
-        content: "New article content"
-      })
+      .send(newArticle)
       .expect(201)
     const articles = yield database.collection("articles").find().toArray()
-    expect(articles.length).to.equal(1)
-    expect(articles[0].title).to.equal("New article title")
-    expect(articles[0].content).to.equal("New article content")
+    articles.length.should.be.exactly(1)
+    const article = articles[0]
+    article.title.should.be.exactly(newArticle.title)
+    article.content.should.be.exactly(newArticle.content)
+    response.body.should.eql({
+      _links: {
+        self: `http://localhost:3000/articles/${article._id}`
+      },
+      id: article._id.toString(),
+      title: article.title,
+      content: article.content
+    })
   })
 
   afterEach(function *() {
