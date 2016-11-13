@@ -97,6 +97,33 @@ describe("API", () => {
     })
   })
 
+  it("should update a resource", function *() {
+    const originalArticle = yield _createArticle()
+    const update = {
+      title: "Updated article title",
+      content: "Updated article content"
+    }
+    yield request("http://localhost:3000")
+      .put(`/articles/${originalArticle._id}`)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/hal+json")
+      .send(update)
+      .expect(200, {
+        _links: {
+          self: `http://localhost:3000/articles/${originalArticle._id}`
+        },
+        id: originalArticle._id.toString(),
+        title: update.title,
+        content: update.content
+      })
+    const currentArticles = yield database.collection("articles").find().toArray()
+    currentArticles.length.should.be.exactly(1)
+    const currentArticle = articles[0]
+    currentArticle._id.toString().should.be.exactly(originalArticle._id.toString())
+    currentArticle.title.should.be.exactly(update.title)
+    currentArticle.content.should.be.exactly(update.content)
+  })
+
   afterEach(function *() {
     yield database.collection("articles").deleteMany()
   })
