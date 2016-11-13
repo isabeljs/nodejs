@@ -118,7 +118,7 @@ describe("API", () => {
       })
     const currentArticles = yield database.collection("articles").find().toArray()
     currentArticles.length.should.be.exactly(1)
-    const currentArticle = articles[0]
+    const currentArticle = currentArticles[0]
     currentArticle._id.toString().should.be.exactly(originalArticle._id.toString())
     currentArticle.title.should.be.exactly(update.title)
     currentArticle.content.should.be.exactly(update.content)

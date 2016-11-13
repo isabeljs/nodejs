@@ -29,4 +29,10 @@ module.exports = router => {
         .link("self", articleResource.paths.article(article._id))
     })
 
+    .put(articleResource.paths.article, function *updateArticle() {
+      const article = yield articleService.update(this.params.id, this.request.body)
+      return api.ok(articleResource.fromMongo(article))
+        .link("self", articleResource.paths.article(this.params.id))
+    })
+
 }
