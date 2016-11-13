@@ -43,6 +43,13 @@ describe("API", () => {
       })
   })
 
+  it("should fail when getting a nonexistent resource", function *() {
+    yield request("http://localhost:3000")
+      .get("/articles/5828d61ddf282e2088061e02")
+      .set("Accept", "application/hal+json")
+      .expect(404, {})
+  })
+
   it("should list resources", function *() {
     const article1 = yield _createArticle()
     const article2 = yield _createArticle()
@@ -122,6 +129,18 @@ describe("API", () => {
     currentArticle._id.toString().should.be.exactly(originalArticle._id.toString())
     currentArticle.title.should.be.exactly(update.title)
     currentArticle.content.should.be.exactly(update.content)
+  })
+
+  it("should fail when replacing a nonexistent resource", function *() {
+    yield request("http://localhost:3000")
+      .put("/articles/5828d61ddf282e2088061e02")
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/hal+json")
+      .send({
+        title: "Updated article title",
+        content: "Updated article content"
+      })
+      .expect(404, {})
   })
 
   afterEach(function *() {

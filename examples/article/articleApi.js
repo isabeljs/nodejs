@@ -31,8 +31,12 @@ module.exports = router => {
 
     .put(articleResource.paths.article, function *replaceArticle() {
       const article = yield articleService.replace(this.params.id, this.request.body)
-      return api.ok(articleResource.fromMongo(article))
-        .link("self", articleResource.paths.article(this.params.id))
+      if (!article) {
+        return api.notFound()
+      } else {
+        return api.ok(articleResource.fromMongo(article))
+          .link("self", articleResource.paths.article(this.params.id))
+      }
     })
 
 }
