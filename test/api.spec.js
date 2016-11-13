@@ -97,7 +97,7 @@ describe("API", () => {
     })
   })
 
-  it("should update a resource", function *() {
+  it("should replace a resource", function *() {
     const originalArticle = yield _createArticle()
     const update = {
       title: "Updated article title",
