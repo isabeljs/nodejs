@@ -5,8 +5,9 @@ const request = require('supertest')
 
 const app = require("koa")()
 const router = require("koa-router")()
-const mediaTypes = require("app-root-path").require("/").api.mediaTypes
-const database = require("app-root-path").require("/examples/database")
+const bodyParser = require("koa-bodyparser")
+const mediaTypes = require("../").api.mediaTypes
+const database = require("../examples/database")
 
 describe("HAL", () => {
 
@@ -22,11 +23,11 @@ describe("HAL", () => {
   before(function *() {
     yield database.connect("mongodb://localhost:27017/ron")
     mediaTypes(mediaTypes.HAL)
-    require("app-root-path").require("/examples/article/articleApi")(router)
-    app.use(router.routes()).use(router.allowedMethods()).listen(3000)
+    require("../examples/article/articleApi")(router)
+    app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
   })
 
-  it("should format single document", function *() {
+  it("should get single document", function *() {
     const article = yield _createArticle()
     yield request("http://localhost:3000")
       .get(`/articles/${article._id}`)
@@ -42,7 +43,7 @@ describe("HAL", () => {
       })
   })
 
-  it("should format multiple documents", function *() {
+  it("should get multiple documents", function *() {
     const article1 = yield _createArticle()
     const article2 = yield _createArticle()
     yield request("http://localhost:3000")
@@ -68,6 +69,22 @@ describe("HAL", () => {
           }
         }]
       })
+  })
+
+  it("should create single document", function *() {
+    yield request("http://localhost:3000")
+      .post("/articles")
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/hal+json")
+      .send({
+        title: "New article title",
+        content: "New article content"
+      })
+      .expect(201)
+    const articles = yield database.collection("articles").find().toArray()
+    expect(articles.length).to.equal(1)
+    expect(articles[0].title).to.equal("New article title")
+    expect(articles[0].content).to.equal("New article content")
   })
 
   afterEach(function *() {

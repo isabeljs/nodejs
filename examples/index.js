@@ -1,6 +1,7 @@
 const co = require("co")
 const app = require("koa")()
 const router = require("koa-router")()
+const bodyParser = require("koa-bodyparser")
 const mediaTypes = require("../").api.mediaTypes
 const database = require("./database")
 
@@ -16,7 +17,7 @@ co(function *() {
   require("./article/articleApi")(router)
 
   // bootstrap
-  app.use(router.routes()).use(router.allowedMethods()).listen(3000)
+  app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
 
 }).catch(error => {
   console.error(error.stack)
