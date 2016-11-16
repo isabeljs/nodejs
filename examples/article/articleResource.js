@@ -3,11 +3,17 @@ const path = require("../../").api.path
 module.exports = {
 
   fromMongo: mongoObject => {
-    return {
+    const article = {
       id: mongoObject._id,
-      title: mongoObject.title,
-      content: mongoObject.content
+      title: mongoObject.title
     }
+    if (mongoObject.hasOwnProperty("content")) {
+      article.content = mongoObject.content
+    }
+    if (mongoObject.hasOwnProperty("description")) {
+      article.description = mongoObject.description
+    }
+    return article
   },
 
   paths: {

@@ -108,7 +108,7 @@ describe("API", () => {
     const originalArticle = yield _createArticle()
     const update = {
       title: "Updated article title",
-      content: "Updated article content"
+      description: "Updated article description"
     }
     yield request("http://localhost:3000")
       .put(`/articles/${originalArticle._id}`)
@@ -121,14 +121,14 @@ describe("API", () => {
         },
         id: originalArticle._id.toString(),
         title: update.title,
-        content: update.content
+        description: update.description
       })
     const currentArticles = yield database.collection("articles").find().toArray()
     currentArticles.length.should.be.exactly(1)
     const currentArticle = currentArticles[0]
     currentArticle._id.toString().should.be.exactly(originalArticle._id.toString())
     currentArticle.title.should.be.exactly(update.title)
-    currentArticle.content.should.be.exactly(update.content)
+    currentArticle.description.should.be.exactly(update.description)
   })
 
   it("should fail when replacing a nonexistent resource", function *() {
@@ -138,7 +138,7 @@ describe("API", () => {
       .set("Accept", "application/hal+json")
       .send({
         title: "Updated article title",
-        content: "Updated article content"
+        description: "Updated article description"
       })
       .expect(404, {})
   })
