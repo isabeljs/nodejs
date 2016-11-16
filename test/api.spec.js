@@ -37,7 +37,7 @@ describe("API", () => {
         _links: {
           self: `http://localhost:3000/articles/${article._id}`
         },
-        id: article._id.toString(),
+        _id: article._id.toString(),
         title: article.title,
         content: article.content
       })
@@ -64,14 +64,14 @@ describe("API", () => {
           _links: {
             self: `http://localhost:3000/articles/${article1._id}`
           },
-          id: article1._id.toString(),
+          _id: article1._id.toString(),
           title: article1.title,
           content: article1.content
         }, {
           _links: {
             self: `http://localhost:3000/articles/${article2._id}`
           },
-          id: article2._id.toString(),
+          _id: article2._id.toString(),
           title: article2.title,
           content: article2.content
         }]
@@ -92,13 +92,15 @@ describe("API", () => {
     const articles = yield database.collection("articles").find().toArray()
     articles.length.should.be.exactly(1)
     const article = articles[0]
+    Object.keys(article).length.should.be.exactly(3)
+    article.should.have.property("_id")
     article.title.should.be.exactly(newArticle.title)
     article.content.should.be.exactly(newArticle.content)
     response.body.should.eql({
       _links: {
         self: `http://localhost:3000/articles/${article._id}`
       },
-      id: article._id.toString(),
+      _id: article._id.toString(),
       title: article.title,
       content: article.content
     })
@@ -107,6 +109,7 @@ describe("API", () => {
   it("should replace a resource", function *() {
     const originalArticle = yield _createArticle()
     const update = {
+      _id: originalArticle._id.toString(),
       title: "Updated article title",
       description: "Updated article description"
     }
@@ -119,13 +122,14 @@ describe("API", () => {
         _links: {
           self: `http://localhost:3000/articles/${originalArticle._id}`
         },
-        id: originalArticle._id.toString(),
+        _id: originalArticle._id.toString(),
         title: update.title,
         description: update.description
       })
     const currentArticles = yield database.collection("articles").find().toArray()
     currentArticles.length.should.be.exactly(1)
     const currentArticle = currentArticles[0]
+    Object.keys(currentArticle).length.should.be.exactly(3)
     currentArticle._id.toString().should.be.exactly(originalArticle._id.toString())
     currentArticle.title.should.be.exactly(update.title)
     currentArticle.description.should.be.exactly(update.description)
