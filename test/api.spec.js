@@ -111,7 +111,8 @@ describe("API", () => {
     const update = {
       _id: originalArticle._id.toString(),
       title: "Updated article title",
-      description: "Updated article description"
+      description: "Updated article description",
+      tags: ["foo", "bar"]
     }
     yield request("http://localhost:3000")
       .put(`/articles/${originalArticle._id}`)
@@ -124,15 +125,17 @@ describe("API", () => {
         },
         _id: originalArticle._id.toString(),
         title: update.title,
-        description: update.description
+        description: update.description,
+        tags: update.tags
       })
     const currentArticles = yield database.collection("articles").find().toArray()
     currentArticles.length.should.be.exactly(1)
     const currentArticle = currentArticles[0]
-    Object.keys(currentArticle).length.should.be.exactly(3)
+    Object.keys(currentArticle).length.should.be.exactly(4)
     currentArticle._id.toString().should.be.exactly(originalArticle._id.toString())
     currentArticle.title.should.be.exactly(update.title)
     currentArticle.description.should.be.exactly(update.description)
+    currentArticle.tags.should.eql(update.tags)
   })
 
   it("should fail when replacing a nonexistent resource", function *() {
