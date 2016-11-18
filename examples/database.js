@@ -1,6 +1,6 @@
 const MongoClient = require("mongodb").MongoClient
 
-let database = undefined
+let database = null
 
 module.exports = {
 

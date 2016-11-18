@@ -11,6 +11,8 @@ const database = require("../examples/database")
 
 describe("API", () => {
 
+  let server = null
+
   const _createArticle = function *() {
     const article = {
       title: Math.random().toString(36),
@@ -24,7 +26,7 @@ describe("API", () => {
     yield database.connect("mongodb://localhost:27017/ron")
     mediaTypes(mediaTypes.HAL)
     require("../examples/article/articleApi")(router)
-    app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
+    server = app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
   })
 
   it("should get a resource", function *() {
@@ -217,6 +219,10 @@ describe("API", () => {
 
   afterEach(function *() {
     yield database.collection("articles").deleteMany()
+  })
+
+  after(function *() {
+    server.close()
   })
 
 })
