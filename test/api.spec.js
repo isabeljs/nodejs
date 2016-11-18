@@ -53,7 +53,7 @@ describe("API", () => {
     allowHeader.should.not.match(/\bDELETE\b/)
   })
 
-  it("should get a resource", function *() {
+  it("should find a resource", function *() {
     const article = yield _createArticle()
     yield request("http://localhost:3000")
       .get(`/articles/${article._id}`)
@@ -69,14 +69,14 @@ describe("API", () => {
       })
   })
 
-  it("should fail when getting a nonexistent resource", function *() {
+  it("should fail when finding a nonexistent resource", function *() {
     yield request("http://localhost:3000")
       .get("/articles/000000000000000000000000")
       .set("Accept", "application/hal+json")
       .expect(404, {})
   })
 
-  it("should list resources", function *() {
+  it("should find resources", function *() {
     const article1 = yield _createArticle()
     const article2 = yield _createArticle()
     yield request("http://localhost:3000")
@@ -104,7 +104,7 @@ describe("API", () => {
       })
   })
 
-  it("should create a resource", function *() {
+  it("should insert a resource", function *() {
     const newArticle = {
       title: "New article title",
       content: "New article content"
@@ -239,6 +239,17 @@ describe("API", () => {
       .delete("/articles/000000000000000000000000")
       .set("Accept", "application/hal+json")
       .expect(404)
+  })
+
+  it("should delete resources", function *() {
+    _createArticle()
+    _createArticle()
+    yield request("http://localhost:3000")
+      .delete("/articles")
+      .set("Accept", "application/hal+json")
+      .expect(204)
+    const currentArticles = yield database.collection("articles").find().toArray()
+    currentArticles.length.should.be.exactly(0)
   })
 
   afterEach(function *() {
