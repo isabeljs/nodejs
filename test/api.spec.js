@@ -202,6 +202,7 @@ describe("API", () => {
     const article = yield _createArticle()
     yield request("http://localhost:3000")
       .delete(`/articles/${article._id}`)
+      .set("Accept", "application/hal+json")
       .expect(204)
     const currentArticles = yield database.collection("articles").find().toArray()
     currentArticles.length.should.be.exactly(0)
@@ -210,6 +211,7 @@ describe("API", () => {
   it("should fail when deleting a nonexistent resource", function *() {
     yield request("http://localhost:3000")
       .delete("/articles/000000000000000000000000")
+      .set("Accept", "application/hal+json")
       .expect(404)
   })
 

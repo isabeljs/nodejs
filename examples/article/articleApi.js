@@ -49,4 +49,13 @@ module.exports = router => {
       }
     })
 
+    .delete(articlePaths.article, function *deleteArticle() {
+      const deletedArticleId = yield articleService.deleteOneById(this.params.id, false)
+      if (!deletedArticleId) {
+        return api.notFound()
+      } else {
+        return api.noContent()
+      }
+    })
+
 }
