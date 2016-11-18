@@ -29,6 +29,30 @@ describe("API", () => {
     server = app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
   })
 
+  it("should respond to OPTIONS requests targeting one resource", function *() {
+    const response = yield request("http://localhost:3000")
+      .options("/articles/000000000000000000000000")
+      .expect(204)
+    const allowHeader = response.get("Allow")
+    allowHeader.should.match(/\bGET\b/)
+    allowHeader.should.not.match(/\bPOST\b/)
+    allowHeader.should.match(/\bPUT\b/)
+    allowHeader.should.match(/\bPATCH\b/)
+    allowHeader.should.match(/\bDELETE\b/)
+  })
+
+  it("should respond to OPTIONS requests targeting a collection of resources", function *() {
+    const response = yield request("http://localhost:3000")
+      .options("/articles")
+      .expect(204)
+    const allowHeader = response.get("Allow")
+    allowHeader.should.match(/\bGET\b/)
+    allowHeader.should.match(/\bPOST\b/)
+    allowHeader.should.not.match(/\bPUT\b/)
+    allowHeader.should.not.match(/\bPATCH\b/)
+    allowHeader.should.not.match(/\bDELETE\b/)
+  })
+
   it("should get a resource", function *() {
     const article = yield _createArticle()
     yield request("http://localhost:3000")
