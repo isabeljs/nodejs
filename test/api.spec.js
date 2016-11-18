@@ -45,7 +45,7 @@ describe("API", () => {
 
   it("should fail when getting a nonexistent resource", function *() {
     yield request("http://localhost:3000")
-      .get("/articles/5828d61ddf282e2088061e02")
+      .get("/articles/000000000000000000000000")
       .set("Accept", "application/hal+json")
       .expect(404, {})
   })
@@ -109,7 +109,6 @@ describe("API", () => {
   it("should replace a resource", function *() {
     const originalArticle = yield _createArticle()
     const update = {
-      _id: originalArticle._id.toString(),
       title: "Updated article title",
       description: "Updated article description",
       tags: ["foo", "bar"]
@@ -139,14 +138,63 @@ describe("API", () => {
   })
 
   it("should fail when replacing a nonexistent resource", function *() {
+    const update = {
+      title: "Updated article title",
+      description: "Updated article description",
+      tags: ["foo", "bar"]
+    }
     yield request("http://localhost:3000")
-      .put("/articles/5828d61ddf282e2088061e02")
+      .put("/articles/000000000000000000000000")
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
-      .send({
-        title: "Updated article title",
-        description: "Updated article description"
+      .send(update)
+      .expect(404, {})
+  })
+
+  it("should update a resource", function *() {
+    const originalArticle = yield _createArticle()
+    const update = {
+      title: "Updated article title",
+      description: "Updated article description",
+      tags: ["foo", "bar"]
+    }
+    yield request("http://localhost:3000")
+      .patch(`/articles/${originalArticle._id}`)
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/hal+json")
+      .send(update)
+      .expect(200, {
+        _links: {
+          self: `http://localhost:3000/articles/${originalArticle._id}`
+        },
+        _id: originalArticle._id.toString(),
+        title: update.title,
+        content: originalArticle.content,
+        description: update.description,
+        tags: update.tags
       })
+    const currentArticles = yield database.collection("articles").find().toArray()
+    currentArticles.length.should.be.exactly(1)
+    const currentArticle = currentArticles[0]
+    Object.keys(currentArticle).length.should.be.exactly(5)
+    currentArticle._id.toString().should.be.exactly(originalArticle._id.toString())
+    currentArticle.title.should.be.exactly(update.title)
+    currentArticle.content.should.be.exactly(originalArticle.content)
+    currentArticle.description.should.be.exactly(update.description)
+    currentArticle.tags.should.eql(update.tags)
+  })
+
+  it("should fail when updating a nonexistent resource", function *() {
+    const update = {
+      title: "Updated article title",
+      description: "Updated article description",
+      tags: ["foo", "bar"]
+    }
+    yield request("http://localhost:3000")
+      .patch("/articles/000000000000000000000000")
+      .set("Content-Type", "application/json")
+      .set("Accept", "application/hal+json")
+      .send(update)
       .expect(404, {})
   })
 
