@@ -42,4 +42,9 @@ module.exports = router => {
       return !deletedArticleId ? api.notFound() : api.noContent()
     })
 
+    .delete(articlePaths.articles, function *deleteArticles() {
+      yield articleService.deleteMany()
+      return api.noContent()
+    })
+
 }

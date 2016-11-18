@@ -50,7 +50,7 @@ describe("API", () => {
     allowHeader.should.match(/\bPOST\b/)
     allowHeader.should.not.match(/\bPUT\b/)
     allowHeader.should.not.match(/\bPATCH\b/)
-    allowHeader.should.not.match(/\bDELETE\b/)
+    allowHeader.should.match(/\bDELETE\b/)
   })
 
   it("should find a resource", function *() {
