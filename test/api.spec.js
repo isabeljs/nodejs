@@ -1,6 +1,6 @@
 require("co-mocha")
-require("should")
 
+const should = require("should")
 const request = require('supertest')
 
 const app = require("koa")()
@@ -12,18 +12,20 @@ const database = require("../examples/database")
 describe("API", () => {
 
   let server = null
+  let articlesConnection = null
 
   const _createArticle = function *() {
     const article = {
       title: Math.random().toString(36),
       content: Math.random().toString(36)
     }
-    yield database.collection("articles").insertOne(article)
+    yield articlesConnection.insertOne(article)
     return article
   }
 
   before(function *() {
     yield database.connect("mongodb://localhost:27017/ron")
+    articlesConnection = database.collection("articles")
     mediaTypes(mediaTypes.HAL)
     require("../examples/article/articleApi")(router)
     server = app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
@@ -79,29 +81,32 @@ describe("API", () => {
   it("should find resources", function *() {
     const article1 = yield _createArticle()
     const article2 = yield _createArticle()
-    yield request("http://localhost:3000")
+    const response = yield request("http://localhost:3000")
       .get("/articles")
       .set("Accept", "application/hal+json")
-      .expect(200, {
-        _links: {
-          self: "http://localhost:3000/articles"
-        },
-        _embedded: [{
-          _links: {
-            self: `http://localhost:3000/articles/${article1._id}`
-          },
-          _id: article1._id.toString(),
-          title: article1.title,
-          content: article1.content
-        }, {
-          _links: {
-            self: `http://localhost:3000/articles/${article2._id}`
-          },
-          _id: article2._id.toString(),
-          title: article2.title,
-          content: article2.content
-        }]
-      })
+      .expect(200)
+    response.body.should.have.a.property("_links")
+    response.body.should.have.a.property("_embedded")
+    response.body._links.should.eql({
+      self: "http://localhost:3000/articles"
+    })
+    response.body._embedded.should.be.an.Array().and.have.a.length(2)
+    response.body._embedded.should.containEql({
+      _links: {
+        self: `http://localhost:3000/articles/${article1._id}`
+      },
+      _id: article1._id.toString(),
+      title: article1.title,
+      content: article1.content
+    })
+    response.body._embedded.should.containEql({
+      _links: {
+        self: `http://localhost:3000/articles/${article2._id}`
+      },
+      _id: article2._id.toString(),
+      title: article2.title,
+      content: article2.content
+    })
   })
 
   it("should insert a resource", function *() {
@@ -115,13 +120,13 @@ describe("API", () => {
       .set("Accept", "application/hal+json")
       .send(newArticle)
       .expect(201)
-    const articles = yield database.collection("articles").find().toArray()
-    articles.length.should.be.exactly(1)
+    const articles = yield articlesConnection.find().toArray()
+    articles.should.have.length(1)
     const article = articles[0]
-    Object.keys(article).length.should.be.exactly(3)
-    article.should.have.property("_id")
-    article.title.should.be.exactly(newArticle.title)
-    article.content.should.be.exactly(newArticle.content)
+    Object.keys(article).should.have.a.length(3)
+    article.should.have.a.property("_id").which.is.an.Object()
+    article.title.should.equal(newArticle.title)
+    article.content.should.equal(newArticle.content)
     response.body.should.eql({
       _links: {
         self: `http://localhost:3000/articles/${article._id}`
@@ -153,14 +158,13 @@ describe("API", () => {
         description: update.description,
         tags: update.tags
       })
-    const currentArticles = yield database.collection("articles").find().toArray()
-    currentArticles.length.should.be.exactly(1)
-    const currentArticle = currentArticles[0]
-    Object.keys(currentArticle).length.should.be.exactly(4)
-    currentArticle._id.toString().should.be.exactly(originalArticle._id.toString())
-    currentArticle.title.should.be.exactly(update.title)
-    currentArticle.description.should.be.exactly(update.description)
-    currentArticle.tags.should.eql(update.tags)
+    const currentArticles = yield articlesConnection.find().toArray()
+    currentArticles.should.eql([{
+      _id: originalArticle._id,
+      title: update.title,
+      description: update.description,
+      tags: update.tags
+    }])
   })
 
   it("should fail when replacing a nonexistent resource", function *() {
@@ -199,15 +203,14 @@ describe("API", () => {
         description: update.description,
         tags: update.tags
       })
-    const currentArticles = yield database.collection("articles").find().toArray()
-    currentArticles.length.should.be.exactly(1)
-    const currentArticle = currentArticles[0]
-    Object.keys(currentArticle).length.should.be.exactly(5)
-    currentArticle._id.toString().should.be.exactly(originalArticle._id.toString())
-    currentArticle.title.should.be.exactly(update.title)
-    currentArticle.content.should.be.exactly(originalArticle.content)
-    currentArticle.description.should.be.exactly(update.description)
-    currentArticle.tags.should.eql(update.tags)
+    const currentArticles = yield articlesConnection.find().toArray()
+    currentArticles.should.eql([{
+      _id: originalArticle._id,
+      title: update.title,
+      content: originalArticle.content,
+      description: update.description,
+      tags: update.tags
+    }])
   })
 
   it("should fail when updating a nonexistent resource", function *() {
@@ -230,8 +233,8 @@ describe("API", () => {
       .delete(`/articles/${article._id}`)
       .set("Accept", "application/hal+json")
       .expect(204)
-    const currentArticles = yield database.collection("articles").find().toArray()
-    currentArticles.length.should.be.exactly(0)
+    const currentArticles = yield articlesConnection.find().toArray()
+    currentArticles.should.be.empty()
   })
 
   it("should fail when deleting a nonexistent resource", function *() {
@@ -248,12 +251,12 @@ describe("API", () => {
       .delete("/articles")
       .set("Accept", "application/hal+json")
       .expect(204)
-    const currentArticles = yield database.collection("articles").find().toArray()
-    currentArticles.length.should.be.exactly(0)
+    const currentArticles = yield articlesConnection.find().toArray()
+    currentArticles.should.be.empty()
   })
 
   afterEach(function *() {
-    yield database.collection("articles").deleteMany()
+    yield articlesConnection.deleteMany()
   })
 
   after(function *() {
