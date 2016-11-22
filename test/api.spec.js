@@ -110,7 +110,7 @@ describe("API", () => {
   })
 
   it("should insert a resource", function *() {
-    const newArticle = {
+    const insert = {
       title: "New article title",
       content: "New article content"
     }
@@ -118,15 +118,15 @@ describe("API", () => {
       .post("/articles")
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
-      .send(newArticle)
+      .send(insert)
       .expect(201)
     const articles = yield articlesConnection.find().toArray()
     articles.should.have.length(1)
     const article = articles[0]
     Object.keys(article).should.have.a.length(3)
     article.should.have.a.property("_id").which.is.an.Object()
-    article.title.should.equal(newArticle.title)
-    article.content.should.equal(newArticle.content)
+    article.title.should.equal(insert.title)
+    article.content.should.equal(insert.content)
     response.body.should.eql({
       _links: {
         self: `http://localhost:3000/articles/${article._id}`
@@ -138,37 +138,37 @@ describe("API", () => {
   })
 
   it("should replace a resource", function *() {
-    const originalArticle = yield _createArticle()
-    const update = {
+    const article = yield _createArticle()
+    const replace = {
       title: "Updated article title",
       description: "Updated article description",
       tags: ["foo", "bar"]
     }
     yield request("http://localhost:3000")
-      .put(`/articles/${originalArticle._id}`)
+      .put(`/articles/${article._id}`)
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
-      .send(update)
+      .send(replace)
       .expect(200, {
         _links: {
-          self: `http://localhost:3000/articles/${originalArticle._id}`
+          self: `http://localhost:3000/articles/${article._id}`
         },
-        _id: originalArticle._id.toString(),
-        title: update.title,
-        description: update.description,
-        tags: update.tags
+        _id: article._id.toString(),
+        title: replace.title,
+        description: replace.description,
+        tags: replace.tags
       })
-    const currentArticles = yield articlesConnection.find().toArray()
-    currentArticles.should.eql([{
-      _id: originalArticle._id,
-      title: update.title,
-      description: update.description,
-      tags: update.tags
+    const articles = yield articlesConnection.find().toArray()
+    articles.should.eql([{
+      _id: article._id,
+      title: replace.title,
+      description: replace.description,
+      tags: replace.tags
     }])
   })
 
   it("should fail when replacing a nonexistent resource", function *() {
-    const update = {
+    const replace = {
       title: "Updated article title",
       description: "Updated article description",
       tags: ["foo", "bar"]
@@ -177,37 +177,37 @@ describe("API", () => {
       .put("/articles/000000000000000000000000")
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
-      .send(update)
+      .send(replace)
       .expect(404, {})
   })
 
   it("should update a resource", function *() {
-    const originalArticle = yield _createArticle()
+    const article = yield _createArticle()
     const update = {
       title: "Updated article title",
       description: "Updated article description",
       tags: ["foo", "bar"]
     }
     yield request("http://localhost:3000")
-      .patch(`/articles/${originalArticle._id}`)
+      .patch(`/articles/${article._id}`)
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
       .send(update)
       .expect(200, {
         _links: {
-          self: `http://localhost:3000/articles/${originalArticle._id}`
+          self: `http://localhost:3000/articles/${article._id}`
         },
-        _id: originalArticle._id.toString(),
+        _id: article._id.toString(),
         title: update.title,
-        content: originalArticle.content,
+        content: article.content,
         description: update.description,
         tags: update.tags
       })
-    const currentArticles = yield articlesConnection.find().toArray()
-    currentArticles.should.eql([{
-      _id: originalArticle._id,
+    const articles = yield articlesConnection.find().toArray()
+    articles.should.eql([{
+      _id: article._id,
       title: update.title,
-      content: originalArticle.content,
+      content: article.content,
       description: update.description,
       tags: update.tags
     }])
@@ -233,8 +233,8 @@ describe("API", () => {
       .delete(`/articles/${article._id}`)
       .set("Accept", "application/hal+json")
       .expect(204)
-    const currentArticles = yield articlesConnection.find().toArray()
-    currentArticles.should.be.empty()
+    const articles = yield articlesConnection.find().toArray()
+    articles.should.be.empty()
   })
 
   it("should fail when deleting a nonexistent resource", function *() {
@@ -245,14 +245,14 @@ describe("API", () => {
   })
 
   it("should delete resources", function *() {
-    _createArticle()
-    _createArticle()
+    yield _createArticle()
+    yield _createArticle()
     yield request("http://localhost:3000")
       .delete("/articles")
       .set("Accept", "application/hal+json")
       .expect(204)
-    const currentArticles = yield articlesConnection.find().toArray()
-    currentArticles.should.be.empty()
+    const articles = yield articlesConnection.find().toArray()
+    articles.should.be.empty()
   })
 
   afterEach(function *() {
