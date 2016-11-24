@@ -11,28 +11,28 @@ const database = require("../examples/database")
 
 describe("API", () => {
 
-  let server = null
-  let articlesCollection = null
+  let _server = null
+  let _articlesCollection = null
 
   const _createArticle = function *() {
     const article = {
       title: Math.random().toString(36),
       content: Math.random().toString(36)
     }
-    yield articlesCollection.insertOne(article)
+    yield _articlesCollection.insertOne(article)
     return article
   }
 
   before(function *() {
     yield database.connect("mongodb://localhost:27017/ron")
-    articlesCollection = database.collection("articles")
+    _articlesCollection = database.collection("articles")
     mediaTypes(mediaTypes.HAL)
     require("../examples/article/articleApi")(router)
-    server = app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
+    _server = app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
   })
 
   before(function *() {
-    yield articlesCollection.deleteMany()
+    yield _articlesCollection.deleteMany()
   })
 
   it("should respond to OPTIONS requests targeting one resource", function *() {
@@ -124,7 +124,7 @@ describe("API", () => {
       .set("Accept", "application/hal+json")
       .send(insert)
       .expect(201)
-    const articles = yield articlesCollection.find().toArray()
+    const articles = yield _articlesCollection.find().toArray()
     articles.should.have.length(1)
     const article = articles[0]
     Object.keys(article).should.have.a.length(3)
@@ -162,7 +162,7 @@ describe("API", () => {
         description: replace.description,
         tags: replace.tags
       })
-    const articles = yield articlesCollection.find().toArray()
+    const articles = yield _articlesCollection.find().toArray()
     articles.should.eql([{
       _id: article._id,
       title: replace.title,
@@ -207,7 +207,7 @@ describe("API", () => {
         description: update.description,
         tags: update.tags
       })
-    const articles = yield articlesCollection.find().toArray()
+    const articles = yield _articlesCollection.find().toArray()
     articles.should.eql([{
       _id: article._id,
       title: update.title,
@@ -237,7 +237,7 @@ describe("API", () => {
       .delete(`/articles/${article._id}`)
       .set("Accept", "application/hal+json")
       .expect(204)
-    const articles = yield articlesCollection.find().toArray()
+    const articles = yield _articlesCollection.find().toArray()
     articles.should.be.empty()
   })
 
@@ -255,16 +255,16 @@ describe("API", () => {
       .delete("/articles")
       .set("Accept", "application/hal+json")
       .expect(204)
-    const articles = yield articlesCollection.find().toArray()
+    const articles = yield _articlesCollection.find().toArray()
     articles.should.be.empty()
   })
 
   afterEach(function *() {
-    yield articlesCollection.deleteMany()
+    yield _articlesCollection.deleteMany()
   })
 
   after(function *() {
-    server.close()
+    _server.close()
   })
 
 })
