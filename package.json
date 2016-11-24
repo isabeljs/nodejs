@@ -31,7 +31,7 @@
     "supertest": "^2.0.1"
   },
   "scripts": {
-    "test": "./node_modules/istanbul/lib/cli.js cover -x \"**/*.spec.js\" ./node_modules/.bin/_mocha -- --recursive ./{lib,test}/**/*.spec.js",
+    "test": "istanbul cover -x \"**/*.spec.js\" node_modules/mocha/bin/_mocha -- --recursive ./{lib,test}/**/*.spec.js",
     "coverage": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   }
 }
