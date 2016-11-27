@@ -6,10 +6,10 @@ const request = require('supertest')
 const app = require("koa")()
 const router = require("koa-router")()
 const bodyParser = require("koa-bodyparser")
-const mediaTypes = require("../").api.mediaTypes
-const database = require("../examples/database")
+const mediaTypes = require("../../").api.mediaTypes
+const database = require("../database")
 
-describe("API", () => {
+describe("articleApi", () => {
 
   let _server = null
   let _articlesCollection = null
@@ -27,7 +27,7 @@ describe("API", () => {
     yield database.connect("mongodb://localhost:27017/ron")
     _articlesCollection = database.collection("articles")
     mediaTypes(mediaTypes.HAL)
-    require("../examples/article/articleApi")(router)
+    require("./articleApi")(router)
     _server = app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
   })
 
