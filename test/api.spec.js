@@ -263,7 +263,7 @@ describe("API", () => {
     yield _articlesCollection.deleteMany()
   })
 
-  after(function *() {
+  after(() => {
     _server.close()
   })
 
