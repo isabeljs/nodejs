@@ -24,7 +24,7 @@ describe("articleApi", () => {
     return article
   }
 
-  const _checkResponseHasNoHeaders = function (response, headers) {
+  const _checkResponseHasNoHeaders = (response, headers) => {
     const actualHeaders = Object.keys(response.headers).map(header => header.toLowerCase())
     headers.filter(header => actualHeaders.indexOf(header.toLowerCase()) >= 0).length.should.equal(0)
   }
