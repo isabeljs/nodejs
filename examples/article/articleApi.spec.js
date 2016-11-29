@@ -1,11 +1,12 @@
 require("co-mocha")
 
 const should = require("should")
-const request = require('supertest')
+const request = require("supertest")
 
 const app = require("koa")()
 const router = require("koa-router")()
 const bodyParser = require("koa-bodyparser")
+
 const mediaTypes = require("../../").api.mediaTypes
 const database = require("../database")
 
@@ -21,6 +22,11 @@ describe("articleApi", () => {
     }
     yield _articlesCollection.insertOne(article)
     return article
+  }
+
+  const _checkResponseHasNoHeaders = function (response, headers) {
+    const actualHeaders = Object.keys(response.headers).map(header => header.toLowerCase())
+    headers.filter(header => actualHeaders.indexOf(header.toLowerCase()) >= 0).length.should.equal(0)
   }
 
   before(function *() {
@@ -76,10 +82,11 @@ describe("articleApi", () => {
   })
 
   it("should fail when finding a nonexistent resource", function *() {
-    yield request("http://localhost:3000")
+    const response = yield request("http://localhost:3000")
       .get("/articles/000000000000000000000000")
       .set("Accept", "application/hal+json")
-      .expect(404, {})
+      .expect(404, "")
+    _checkResponseHasNoHeaders(response, ["Content-Type", "Content-Length"])
   })
 
   it("should find resources", function *() {
@@ -88,6 +95,7 @@ describe("articleApi", () => {
     const response = yield request("http://localhost:3000")
       .get("/articles")
       .set("Accept", "application/hal+json")
+      .expect("Content-Type", "application/hal+json")
       .expect(200)
     response.body.should.have.a.property("_links")
     response.body.should.have.a.property("_embedded")
@@ -123,6 +131,7 @@ describe("articleApi", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
       .send(insert)
+      .expect("Content-Type", "application/hal+json")
       .expect(201)
     const articles = yield _articlesCollection.find().toArray()
     articles.should.have.length(1)
@@ -153,6 +162,7 @@ describe("articleApi", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
       .send(replace)
+      .expect("Content-Type", "application/hal+json")
       .expect(200, {
         _links: {
           self: `http://localhost:3000/articles/${article._id}`
@@ -177,12 +187,13 @@ describe("articleApi", () => {
       description: "Updated article description",
       tags: ["foo", "bar"]
     }
-    yield request("http://localhost:3000")
+    const response = yield request("http://localhost:3000")
       .put("/articles/000000000000000000000000")
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
       .send(replace)
-      .expect(404, {})
+      .expect(404, "")
+    _checkResponseHasNoHeaders(response, ["Content-Type", "Content-Length"])
   })
 
   it("should update a resource", function *() {
@@ -197,6 +208,7 @@ describe("articleApi", () => {
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
       .send(update)
+      .expect("Content-Type", "application/hal+json")
       .expect(200, {
         _links: {
           self: `http://localhost:3000/articles/${article._id}`
@@ -223,38 +235,42 @@ describe("articleApi", () => {
       description: "Updated article description",
       tags: ["foo", "bar"]
     }
-    yield request("http://localhost:3000")
+    const response = yield request("http://localhost:3000")
       .patch("/articles/000000000000000000000000")
       .set("Content-Type", "application/json")
       .set("Accept", "application/hal+json")
       .send(update)
-      .expect(404, {})
+      .expect(404, "")
+    _checkResponseHasNoHeaders(response, ["Content-Type", "Content-Length"])
   })
 
   it("should delete a resource", function *() {
     const article = yield _createArticle()
-    yield request("http://localhost:3000")
+    const response = yield request("http://localhost:3000")
       .delete(`/articles/${article._id}`)
       .set("Accept", "application/hal+json")
-      .expect(204)
+      .expect(204, "")
+    _checkResponseHasNoHeaders(response, ["Content-Type", "Content-Length"])
     const articles = yield _articlesCollection.find().toArray()
     articles.should.be.empty()
   })
 
   it("should fail when deleting a nonexistent resource", function *() {
-    yield request("http://localhost:3000")
+    const response = yield request("http://localhost:3000")
       .delete("/articles/000000000000000000000000")
       .set("Accept", "application/hal+json")
-      .expect(404)
+      .expect(404, "")
+    _checkResponseHasNoHeaders(response, ["Content-Type", "Content-Length"])
   })
 
   it("should delete resources", function *() {
     yield _createArticle()
     yield _createArticle()
-    yield request("http://localhost:3000")
+    const response = yield request("http://localhost:3000")
       .delete("/articles")
       .set("Accept", "application/hal+json")
-      .expect(204)
+      .expect(204, "")
+    _checkResponseHasNoHeaders(response, ["Content-Type", "Content-Length"])
     const articles = yield _articlesCollection.find().toArray()
     articles.should.be.empty()
   })
@@ -265,6 +281,8 @@ describe("articleApi", () => {
 
   after(() => {
     _server.close()
+    database.close()
+    mediaTypes.clear()
   })
 
 })
