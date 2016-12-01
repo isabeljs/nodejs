@@ -17,6 +17,7 @@
     "co": "^4.6.0",
     "debug": "^2.2.0",
     "extend": "^3.0.0",
+    "http-errors": "^1.5.1",
     "koa": "^1.2.4",
     "koa-bodyparser": "^2.2.0",
     "koa-router": "^5.4.0",

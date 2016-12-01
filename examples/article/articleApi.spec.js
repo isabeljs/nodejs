@@ -7,7 +7,8 @@ const app = require("koa")()
 const router = require("koa-router")()
 const bodyParser = require("koa-bodyparser")
 
-const mediaTypes = require("../../").api.mediaTypes
+const ron = require("../../")
+const mediaTypes = ron.api.mediaTypes
 const database = require("../database")
 
 describe("articleApi", () => {
@@ -34,7 +35,7 @@ describe("articleApi", () => {
     _articlesCollection = database.collection("articles")
     mediaTypes(mediaTypes.HAL)
     require("./articleApi")(router)
-    _server = app.use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
+    _server = app.use(ron()).use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
   })
 
   before(function *() {
