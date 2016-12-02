@@ -1,4 +1,4 @@
-const path = require("../../").api.path
+const { path } = require("../../").api
 
 module.exports = {
   article: path("/articles/:id"),

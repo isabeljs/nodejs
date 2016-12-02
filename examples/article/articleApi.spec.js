@@ -8,7 +8,7 @@ const router = require("koa-router")()
 const bodyParser = require("koa-bodyparser")
 
 const ron = require("../../")
-const mediaTypes = ron.api.mediaTypes
+const { mediaTypes } = ron.api
 const database = require("../database")
 
 describe("articleApi", () => {

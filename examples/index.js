@@ -2,7 +2,7 @@ const co = require("co")
 const app = require("koa")()
 const router = require("koa-router")()
 const ron = require("../")
-const mediaTypes = ron.api.mediaTypes
+const { mediaTypes } = ron.api
 
 const database = require("./database")
 
@@ -21,6 +21,4 @@ co(function *() {
 
   )).listen(3000)
 
-}).catch(error => {
-  console.error(error.stack)
-})
+}).catch(error => console.error(error.stack))

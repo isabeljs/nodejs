@@ -1,4 +1,4 @@
-const api = require("../../").api
+const { api } = require("../../")
 const articlePaths = require("./articlePaths")
 const articleService = require("./articleService")
 
