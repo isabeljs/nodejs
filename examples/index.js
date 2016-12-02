@@ -1,7 +1,6 @@
 const co = require("co")
 const app = require("koa")()
 const router = require("koa-router")()
-const bodyParser = require("koa-bodyparser")
 const ron = require("../")
 const mediaTypes = ron.api.mediaTypes
 
@@ -15,11 +14,12 @@ co(function *() {
   // register media-types
   mediaTypes(mediaTypes.HAL)
 
-  // register APIs
-  require("./article/articleApi")(router)
+  app.use(ron(app,
 
-  // bootstrap
-  app.use(ron()).use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
+    // register APIs
+    require("./article/articleApi")(router)
+
+  )).listen(3000)
 
 }).catch(error => {
   console.error(error.stack)

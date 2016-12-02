@@ -34,8 +34,9 @@ describe("articleApi", () => {
     yield database.connect("mongodb://localhost:27017/ron")
     _articlesCollection = database.collection("articles")
     mediaTypes(mediaTypes.HAL)
-    require("./articleApi")(router)
-    _server = app.use(ron()).use(bodyParser()).use(router.routes()).use(router.allowedMethods()).listen(3000)
+    _server = app.use(ron(app,
+      require("./articleApi")(router)
+    )).listen(3000)
   })
 
   before(function *() {
