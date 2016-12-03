@@ -13,11 +13,11 @@
   "bugs": {
     "url": "https://github.com/isabeljs/nodejs/issues"
   },
-  "main": "./index",
-  "files": ["./index.js", "./lib/"],
+  "main": "index",
+  "files": ["index.js", "lib/"],
   "directories": {
-    "lib": "./lib/",
-    "example": "./example/"
+    "lib": "lib/",
+    "example": "example/"
   },
   "dependencies": {
     "accepts": "^1.3.3",
