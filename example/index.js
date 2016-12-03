@@ -1,8 +1,8 @@
 const co = require("co")
 const app = require("koa")()
 const router = require("koa-router")()
-const ron = require("../")
-const { mediaTypes } = ron.api
+const isa = require("../")
+const { mediaTypes } = isa.api
 
 const database = require("./database")
 
@@ -14,7 +14,7 @@ co(function *() {
   // register media-types
   mediaTypes(mediaTypes.HAL)
 
-  app.use(ron(app,
+  app.use(isa(app,
 
     // register APIs
     require("./article/articleApi")(router)

@@ -7,8 +7,8 @@ const app = require("koa")()
 const router = require("koa-router")()
 const bodyParser = require("koa-bodyparser")
 
-const ron = require("../../")
-const { mediaTypes } = ron.api
+const isa = require("../../")
+const { mediaTypes } = isa.api
 const database = require("../database")
 
 describe("articleApi", () => {
@@ -31,10 +31,10 @@ describe("articleApi", () => {
   }
 
   before(function *() {
-    yield database.connect("mongodb://localhost:27017/ron")
+    yield database.connect("mongodb://localhost:27017/isabel")
     _articlesCollection = database.collection("articles")
     mediaTypes(mediaTypes.HAL)
-    _server = app.use(ron(app,
+    _server = app.use(isa(app,
       require("./articleApi")(router)
     )).listen(3000)
   })
