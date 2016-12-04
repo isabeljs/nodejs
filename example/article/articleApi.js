@@ -11,7 +11,7 @@ module.exports = router => api(router)
   })
 
   .get(articlePaths.articles, function *() {
-    const articles = yield articleService.find()
+    const articles = yield articleService.findMany()
     return api.ok(articles)
       .forEach((resource, article) => resource.link("self", articlePaths.article(article._id)))
       .link("self", articlePaths.articles())
