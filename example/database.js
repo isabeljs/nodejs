@@ -2,14 +2,12 @@ const { MongoClient } = require("mongodb")
 
 let database = null
 
+function *connect(url) {
+  database = yield MongoClient.connect(url)
+}
+
 module.exports = {
-
-  connect: function *(url) {
-    database = yield MongoClient.connect(url)
-  },
-
+  connect: connect,
   collection: name => database.collection(name),
-
   close: () => database.close()
-
 }
