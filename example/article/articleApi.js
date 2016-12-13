@@ -41,6 +41,6 @@ module.exports = router => api(router)
   })
 
   .delete(articlePaths.articles, function *deleteArticles() {
-    yield articleService.deleteMany()
+    yield articleService.deleteMany(false)
     return api.noContent()
   })
