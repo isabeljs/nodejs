@@ -1,11 +1,12 @@
+/* eslint-disable func-names, require-yield, max-statements, no-magic-numbers */
+
 require("co-mocha")
 
-const should = require("should")
+const should = require("should") // eslint-disable-line no-unused-vars
 const request = require("supertest")
 
 const app = require("koa")()
 const router = require("koa-router")()
-const bodyParser = require("koa-bodyparser")
 
 const isa = require("../../")
 const { mediaTypes } = isa.api
@@ -16,7 +17,7 @@ describe("articleApi", () => {
   let _server = null
   let _articlesCollection = null
 
-  const _createArticle = function *() {
+  function *_createArticle() {
     const article = {
       title: Math.random().toString(36),
       content: Math.random().toString(36)

@@ -6,7 +6,7 @@ const { mediaTypes } = isa.api
 
 const database = require("./database")
 
-co(function *() {
+co(function *setup() {
 
   // connect to database
   yield database.connect("mongodb://localhost:27017/blog")
@@ -19,6 +19,6 @@ co(function *() {
     // register APIs
     require("./article/articleApi")(router)
 
-  )).listen(3000)
+  )).listen(3000) // eslint-disable-line no-magic-numbers
 
-}).catch(error => console.error(error.stack))
+}).catch(({ stack }) => console.error(stack)) // eslint-disable-line no-console

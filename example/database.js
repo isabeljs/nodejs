@@ -7,7 +7,7 @@ function *connect(url) {
 }
 
 module.exports = {
-  connect: connect,
+  connect,
   collection: name => database.collection(name),
   close: () => database.close()
 }

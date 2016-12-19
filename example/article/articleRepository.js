@@ -3,8 +3,6 @@ const database = require("../database")
 
 module.exports = new class ArticleRepository extends MongoCrudRepository {
 
-  constructor(collection) {
-    super(collection)
-  }
+  // no specific methods
 
 }(database.collection("articles"))
